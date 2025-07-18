@@ -84,14 +84,39 @@ class NeoBot {
   async loadAccount() {
     try {
       const accountPath = path.join(__dirname, '../account.json');
-      const account = JSON.parse(fs.readFileSync(accountPath, 'utf8'));
+      const rawData = JSON.parse(fs.readFileSync(accountPath, 'utf8'));
       
-      if (!account.uid || !account.cookies) {
-        throw new Error('Invalid account.json format');
+      // Handle both formats: array of cookies (Chrome export) or {uid, cookies} object
+      let account;
+      if (Array.isArray(rawData)) {
+        // Chrome/Puppeteer cookie format - convert to bot format
+        const cUserCookie = rawData.find(cookie => cookie.name === 'c_user');
+        if (!cUserCookie) {
+          throw new Error('c_user cookie not found in cookie array');
+        }
+        
+        // Convert to priyanshu-fca format
+        const cookies = rawData.map(cookie => ({
+          key: cookie.name,
+          value: cookie.value
+        }));
+        
+        account = {
+          uid: cUserCookie.value,
+          cookies: cookies
+        };
+        
+        console.log('📱 Loading Facebook account...');
+        console.log(`👤 UID: ${account.uid} (extracted from c_user cookie)`);
+      } else {
+        // Original format with uid and cookies
+        if (!rawData.uid || !rawData.cookies) {
+          throw new Error('Invalid account.json format - missing uid or cookies');
+        }
+        account = rawData;
+        console.log('📱 Loading Facebook account...');
+        console.log(`👤 UID: ${account.uid}`);
       }
-      
-      console.log('📱 Loading Facebook account...');
-      console.log(`👤 UID: ${account.uid}`);
       
       return account;
     } catch (error) {

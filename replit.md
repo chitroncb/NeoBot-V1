@@ -145,3 +145,7 @@ The application is designed to be easily deployable on platforms like Replit, wi
 - **FIXED:** Module loading errors - converted all command files (admin.js, ping.js, help.js, groupadmin.js) from CommonJS to ES modules
 - All 11 commands now load successfully without "module is not defined" errors
 - Bot fully operational with complete command set: admin, ai, ban, groupadmin, help, joke, language, leaderboard, ping, rank, weather
+- **CREATED:** login.js - comprehensive login script for Chrome/Puppeteer cookie format conversion
+- **UPDATED:** Bot account loader to support both Chrome cookie arrays and original {uid, cookies} format
+- **IDENTIFIED:** priyanshu-fca v3.0.1 limitation with Facebook cookie domains ("Cookie has domain set to a public suffix")
+- Login script successfully converts cookies and extracts UID but encounters API library restriction
