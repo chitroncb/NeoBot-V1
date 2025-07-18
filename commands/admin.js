@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   name: 'admin',
   description: 'Admin-only test command',
   role: 2, // Bot admin only

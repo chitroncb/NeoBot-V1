@@ -20,6 +20,7 @@ async function loadCommands() {
     try {
       const filePath = path.join(commandsPath, file);
       const module = await import(filePath);
+      
       const command = module.default;
       
       if (command && command.name && command.execute) {

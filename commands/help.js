@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   name: 'help',
   description: 'Show available commands',
   role: 0, // Available to all users
