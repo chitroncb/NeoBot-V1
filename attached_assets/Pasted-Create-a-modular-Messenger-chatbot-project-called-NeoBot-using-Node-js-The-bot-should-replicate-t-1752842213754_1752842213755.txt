@@ -1,0 +1,82 @@
+Create a modular Messenger chatbot project called “NeoBot” using Node.js. The bot should replicate the core features of GoatBot V2, but be branded under Saifullah Al Neoaz. The project must be designed to run safely and legally within Replit’s environment, using sandboxed authentication and modular architecture.
+
+⚙️ Architecture Requirements:
+
+1. ✅ **Authentication System**:
+   - Use `account.json` to store Facebook login cookies in JSON format
+   - Structure:
+     - `uid`: Facebook user ID
+     - `cookies`: array of cookie objects (key, value, domain, path, secure, httpOnly)
+   - Load cookies using `appState` via `priyanshu-fca` (unofficial API)
+   - Include a disclaimer in the code that this API is unofficial and may be unstable
+   - Ensure the bot runs in a sandboxed, non-commercial environment
+
+2. 🧩 **Command System**:
+   - All commands stored in `commands/` folder as individual `.js` files
+   - Each command exports:
+     - `name`, `description`, `cooldown`, `role`, `execute()` function
+   - Auto-load all commands at startup
+   - Role-based access:
+     - `role: 0` → all users
+     - `role: 2` → bot admins (defined in `config.json`)
+     - `role: 3` → group admins (from thread data)
+
+3. 🔄 **Event Handlers**:
+   - Support `onChat`, `onReply`, `onReaction`, `onEvent`, `onStart`
+   - Custom events can be added via `events/` folder
+
+4. 📊 **XP & Rank System**:
+   - XP gain per message
+   - Level-up notifications
+   - Rank card image generator
+   - Leaderboard command
+
+5. 🧵 **Thread Management**:
+   - Welcome/leave messages
+   - Thread emoji, name, admin list
+   - Thread-specific settings stored in JSON
+
+6. 🧍 **User System**:
+   - User profile: name, avatar, birthday, relationship
+   - Verified badge system
+   - Profile customization commands
+
+7. 🌐 **Language Support**:
+   - English, Bangla, Vietnamese
+   - Language files stored in `languages/`
+   - Dynamic language switch command
+
+8. 🖥️ **Dashboard (optional)**:
+   - Built with Express + React + Tailwind
+   - Login/register system
+   - Thread settings, command toggles, stats
+   - Branding: NeoBot logo, dark mode, custom domain
+
+9. 📦 **Utility Features**:
+   - Weather, jokes, memes
+   - AI chat via GPT API
+   - PDF generator from user data
+   - API tester command
+
+10. 🔒 **Security**:
+    - Blacklist system for users/threads
+    - No 2FA required — admin UID is trusted from `config.json`
+    - Command logging with timestamp
+
+11. 📁 **Data Storage**:
+    - Use JSON files for users and threads
+    - Option to upgrade to MongoDB later
+
+12. 📦 **Package Support**:
+    - Commands and features can be installed via `npm install`
+    - Use `package.json` to define required dependencies
+    - Support for third-party command modules
+
+13. ⚠️ **Licensing & Usage Policy**:
+    - Include a clear usage policy:
+      - This bot is for educational and personal use only
+      - Redistribution, resale, or credit removal is prohibited without explicit permission from Saifullah Al Neoaz
+      - The project uses unofficial APIs and should not be used for commercial deployment
+
+Final output should be a clean, well-structured Node.js project ready to run on Replit, with clear documentation, modular codebase, and full feature parity with GoatBot V2, adapted for safe and legal use.
+
