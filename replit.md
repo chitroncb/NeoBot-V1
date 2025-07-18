@@ -149,3 +149,15 @@ The application is designed to be easily deployable on platforms like Replit, wi
 - **UPDATED:** Bot account loader to support both Chrome cookie arrays and original {uid, cookies} format
 - **IDENTIFIED:** priyanshu-fca v3.0.1 limitation with Facebook cookie domains ("Cookie has domain set to a public suffix")
 - Login script successfully converts cookies and extracts UID but encounters API library restriction
+- **CREATED:** Complete CommonJS event handler system with 7 major event handlers:
+  - `onStart.js` - Bot startup initialization and status display
+  - `onChat.js` - Message processing, command parsing, XP system, permission checks
+  - `onReply.js` - Reply context handling for questions, confirmations, polls, tutorials
+  - `onReaction.js` - Emoji reaction processing with moderation and milestone features
+  - `onEvent.js` - Messenger events (join/leave, admin changes, thread modifications)
+  - `onFirstChat.js` - New user onboarding with greetings and feature highlights
+  - `handlerEvent.js` - Central event dispatcher with analytics and security
+- **UPDATED:** Bot event-handler.js to load CommonJS modules with createRequire
+- **CREATED:** neobot.cjs - Complete CommonJS version with full functionality
+- **ADDED:** Global systems initialization for tracking reactions, replies, spam detection
+- **IMPLEMENTED:** GoatBot V2-style event architecture with modular CommonJS handlers

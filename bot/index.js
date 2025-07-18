@@ -154,6 +154,26 @@ class NeoBot {
     }
   }
   
+  initializeGlobalSystems() {
+    // Initialize global tracking for event handlers
+    global.cooldowns = global.cooldowns || {};
+    global.replyContext = global.replyContext || new Map();
+    global.firstTimeUsers = global.firstTimeUsers || new Set();
+    global.reactionTracking = global.reactionTracking || new Map();
+    global.pinnedMessages = global.pinnedMessages || new Map();
+    global.messageApprovals = global.messageApprovals || new Map();
+    global.messageRejections = global.messageRejections || new Map();
+    global.rateLimits = global.rateLimits || new Map();
+    global.spamDetection = global.spamDetection || new Map();
+    global.analytics = global.analytics || {
+      daily: new Map(),
+      hourly: new Map(),
+      eventTypes: new Map()
+    };
+    
+    console.log('🌐 Global systems initialized');
+  }
+  
   async initializeBot() {
     // Load commands
     console.log('📦 Loading commands...');
@@ -168,6 +188,9 @@ class NeoBot {
     // Initialize systems
     initXPSystem(this.userData);
     initSecurity(this.config);
+    
+    // Initialize global tracking systems
+    this.initializeGlobalSystems();
     
     // Set up message listener
     try {
@@ -202,6 +225,16 @@ class NeoBot {
     console.log('🚀 NeoBot is now online!');
     console.log(`📊 Status: ${this.commands.size} commands, ${this.events.size} events`);
     
+    // Trigger onStart event
+    const onStartHandler = this.events.get('onStart');
+    if (onStartHandler && typeof onStartHandler === 'function') {
+      try {
+        await onStartHandler(this.api, null, this.commands, this.userData, this.threadData, this.config);
+      } catch (error) {
+        console.error('❌ Error in onStart event:', error);
+      }
+    }
+    
     // Save data periodically
     setInterval(() => {
       this.saveUserData();
@@ -211,29 +244,50 @@ class NeoBot {
   
   async handleEvent(event) {
     try {
-      // Handle different event types
-      if (event.type === 'message') {
-        const messageEvent = this.events.get('message');
-        if (messageEvent) {
-          await messageEvent.execute(
-            this.api,
-            event,
-            this.commands,
-            this.userData,
-            this.threadData,
-            this.config
-          );
+      // Use handlerEvent for centralized event processing
+      const handlerEvent = this.events.get('handlerEvent');
+      if (handlerEvent && typeof handlerEvent === 'function') {
+        await handlerEvent(this.api, event, this.commands, this.userData, this.threadData, this.config);
+      } else {
+        // Fallback: process individual events based on type
+        console.log(`🎯 Processing event: ${event.type || 'unknown'}`);
+        
+        // Route to appropriate event handlers
+        const eventHandlers = [];
+        
+        switch (event.type) {
+          case 'message':
+            // Check if first-time user
+            if (this.isFirstTimeUser(event.senderID, event.threadID)) {
+              eventHandlers.push('onFirstChat');
+            }
+            eventHandlers.push('onChat');
+            break;
+            
+          case 'message_reply':
+            eventHandlers.push('onReply');
+            break;
+            
+          case 'message_reaction':
+            eventHandlers.push('onReaction');
+            break;
+            
+          case 'event':
+          default:
+            // Handle Messenger events (join, leave, etc.)
+            eventHandlers.push('onEvent');
+            break;
         }
-      }
-      
-      // Handle other event types
-      if (event.type === 'event') {
-        if (event.logMessageType === 'log:subscribe') {
-          // User joined
-          const welcomeMessage = this.threadData.threads[event.threadID]?.welcomeMessage || 
-                                this.config.welcomeMessage;
-          if (welcomeMessage) {
-            this.api.sendMessage(welcomeMessage, event.threadID);
+        
+        // Execute event handlers
+        for (const handlerName of eventHandlers) {
+          const handler = this.events.get(handlerName);
+          if (handler && typeof handler === 'function') {
+            try {
+              await handler(this.api, event, this.commands, this.userData, this.threadData, this.config);
+            } catch (error) {
+              console.error(`❌ Error in ${handlerName}:`, error);
+            }
           }
         }
       }
@@ -241,6 +295,15 @@ class NeoBot {
     } catch (error) {
       console.error('❌ Event handling error:', error.message);
     }
+  }
+  
+  isFirstTimeUser(senderID, threadID) {
+    if (!this.userData.users || !this.userData.users[senderID]) {
+      return true;
+    }
+    
+    const user = this.userData.users[senderID];
+    return user.messageCount <= 1 && user.xp <= 0;
   }
 }
 

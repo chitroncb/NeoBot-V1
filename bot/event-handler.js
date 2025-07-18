@@ -1,7 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { createRequire } from 'module';
 
+const require = createRequire(import.meta.url);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -19,20 +21,26 @@ async function loadEvents() {
   for (const file of eventFiles) {
     try {
       const filePath = path.join(eventsPath, file);
-      const module = await import(filePath);
-      const event = module.default;
       
-      if (event && event.name && event.execute) {
-        events.set(event.name, event);
-        console.log(`✅ Loaded event: ${event.name}`);
+      // Clear require cache to allow reloading
+      delete require.cache[require.resolve(filePath)];
+      
+      // Load CommonJS event handler
+      const eventHandler = require(filePath);
+      
+      if (typeof eventHandler === 'function') {
+        const eventName = path.basename(file, '.js');
+        events.set(eventName, eventHandler);
+        console.log(`✅ Loaded event: ${eventName}`);
       } else {
-        console.warn(`⚠️  Event ${file} missing required properties`);
+        console.warn(`⚠️  Event ${file} is not a function`);
       }
     } catch (error) {
       console.error(`❌ Failed to load event ${file}:`, error.message);
     }
   }
   
+  console.log(`📊 Total events loaded: ${events.size}`);
   return events;
 }
 
