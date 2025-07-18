@@ -105,18 +105,8 @@ class NeoBot {
     try {
       const account = await this.loadAccount();
       
-      // Convert cookies to appState format
-      const appState = account.cookies.map(cookie => ({
-        key: cookie.key,
-        value: cookie.value,
-        domain: cookie.domain,
-        path: cookie.path,
-        hostOnly: false,
-        creation: new Date().toISOString(),
-        lastAccessed: new Date().toISOString(),
-        secure: cookie.secure,
-        httpOnly: cookie.httpOnly
-      }));
+      // Use cookies directly as appState (they're already in the correct format)
+      const appState = account.cookies;
       
       console.log('🔐 Authenticating with Facebook...');
       
