@@ -1,6 +1,6 @@
-import { getLeaderboard } from '../bot/xp-system.js';
+const { getLeaderboard } = require('../bot/xp-system.js');
 
-export default {
+module.exports = {
   name: "leaderboard",
   description: "Show the XP leaderboard",
   usage: "/leaderboard [limit]",

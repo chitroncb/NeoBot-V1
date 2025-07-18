@@ -1,187 +1,127 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
+/**
+ * Security System for NeoBot
+ * Handles user permissions, rate limiting, and moderation
+ */
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+let config = null;
+const rateLimits = new Map();
+const spamDetection = new Map();
 
-class SecurityManager {
-  constructor(config) {
-    this.config = config;
-    this.blacklistedUsers = new Set(config.security?.blacklistedUsers || []);
-    this.blacklistedThreads = new Set(config.security?.blacklistedThreads || []);
-    this.bannedCommands = new Set(config.security?.bannedCommands || []);
-    this.rateLimits = new Map();
-    this.commandLogs = [];
-    
-    console.log('🔒 Security system initialized');
-  }
+function initSecurity(configRef) {
+  config = configRef;
+  console.log('✅ Security system initialized');
+}
+
+function isAdmin(userID) {
+  if (!config) return false;
+  return config.adminUid === userID || 
+         (config.admins && config.admins.includes(userID));
+}
+
+function isBlacklisted(userID, threadID = null) {
+  if (!config || !config.security) return false;
   
-  isUserBlacklisted(userId) {
-    return this.blacklistedUsers.has(userId);
-  }
+  const { blacklistedUsers = [], blacklistedThreads = [] } = config.security;
   
-  isThreadBlacklisted(threadId) {
-    return this.blacklistedThreads.has(threadId);
-  }
+  return blacklistedUsers.includes(userID) || 
+         (threadID && blacklistedThreads.includes(threadID));
+}
+
+function checkRateLimit(userID, command, cooldownMs = 3000) {
+  const key = `${userID}_${command}`;
+  const now = Date.now();
   
-  isCommandBanned(commandName) {
-    return this.bannedCommands.has(commandName);
-  }
-  
-  blacklistUser(userId, reason = 'No reason provided') {
-    this.blacklistedUsers.add(userId);
-    this.logSecurity('USER_BLACKLISTED', { userId, reason });
-    this.saveSecurityConfig();
-    return true;
-  }
-  
-  unblacklistUser(userId) {
-    const removed = this.blacklistedUsers.delete(userId);
-    if (removed) {
-      this.logSecurity('USER_UNBLACKLISTED', { userId });
-      this.saveSecurityConfig();
-    }
-    return removed;
-  }
-  
-  blacklistThread(threadId, reason = 'No reason provided') {
-    this.blacklistedThreads.add(threadId);
-    this.logSecurity('THREAD_BLACKLISTED', { threadId, reason });
-    this.saveSecurityConfig();
-    return true;
-  }
-  
-  unblacklistThread(threadId) {
-    const removed = this.blacklistedThreads.delete(threadId);
-    if (removed) {
-      this.logSecurity('THREAD_UNBLACKLISTED', { threadId });
-      this.saveSecurityConfig();
-    }
-    return removed;
-  }
-  
-  banCommand(commandName, reason = 'No reason provided') {
-    this.bannedCommands.add(commandName);
-    this.logSecurity('COMMAND_BANNED', { commandName, reason });
-    this.saveSecurityConfig();
-    return true;
-  }
-  
-  unbanCommand(commandName) {
-    const removed = this.bannedCommands.delete(commandName);
-    if (removed) {
-      this.logSecurity('COMMAND_UNBANNED', { commandName });
-      this.saveSecurityConfig();
-    }
-    return removed;
-  }
-  
-  checkRateLimit(userId, commandName) {
-    if (!this.config.enableRateLimit) return false;
-    
-    const key = `${userId}_${commandName}`;
-    const now = Date.now();
-    const maxCommands = this.config.maxCommandsPerMinute || 10;
-    const timeWindow = 60000; // 1 minute
-    
-    if (!this.rateLimits.has(key)) {
-      this.rateLimits.set(key, []);
-    }
-    
-    const timestamps = this.rateLimits.get(key);
-    
-    // Remove old timestamps
-    const validTimestamps = timestamps.filter(timestamp => now - timestamp < timeWindow);
-    
-    if (validTimestamps.length >= maxCommands) {
-      this.logSecurity('RATE_LIMIT_EXCEEDED', { userId, commandName, count: validTimestamps.length });
-      return true; // Rate limit exceeded
-    }
-    
-    validTimestamps.push(now);
-    this.rateLimits.set(key, validTimestamps);
-    
-    return false; // Within rate limit
-  }
-  
-  logCommand(userId, threadId, commandName, success = true, error = null) {
-    if (!this.config.enableLogging) return;
-    
-    const logEntry = {
-      timestamp: new Date().toISOString(),
-      userId,
-      threadId,
-      commandName,
-      success,
-      error: error?.message || null
-    };
-    
-    this.commandLogs.push(logEntry);
-    
-    // Keep only last 1000 logs
-    if (this.commandLogs.length > 1000) {
-      this.commandLogs = this.commandLogs.slice(-1000);
-    }
-    
-    // Log to console
-    const status = success ? '✅' : '❌';
-    console.log(`[${logEntry.timestamp}] ${status} ${commandName} - User: ${userId}, Thread: ${threadId}`);
-  }
-  
-  logSecurity(type, data) {
-    const logEntry = {
-      timestamp: new Date().toISOString(),
-      type,
-      data
-    };
-    
-    console.log(`[SECURITY] ${type}:`, data);
-    
-    // You could save security logs to file here
-    // fs.appendFileSync('security.log', JSON.stringify(logEntry) + '\n');
-  }
-  
-  saveSecurityConfig() {
-    try {
-      const configPath = path.join(__dirname, '../config.json');
-      const config = JSON.parse(fs.readFileSync(configPath, 'utf8'));
-      
-      config.security = {
-        blacklistedUsers: Array.from(this.blacklistedUsers),
-        blacklistedThreads: Array.from(this.blacklistedThreads),
-        bannedCommands: Array.from(this.bannedCommands)
+  if (rateLimits.has(key)) {
+    const lastUsed = rateLimits.get(key);
+    if (now - lastUsed < cooldownMs) {
+      return {
+        limited: true,
+        timeLeft: Math.ceil((cooldownMs - (now - lastUsed)) / 1000)
       };
-      
-      fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
-      console.log('💾 Security config saved');
-    } catch (error) {
-      console.error('❌ Failed to save security config:', error.message);
     }
   }
   
-  getSecurityStats() {
+  rateLimits.set(key, now);
+  return { limited: false };
+}
+
+function detectSpam(userID, message) {
+  const now = Date.now();
+  
+  if (!spamDetection.has(userID)) {
+    spamDetection.set(userID, []);
+  }
+  
+  const userMessages = spamDetection.get(userID);
+  
+  // Remove messages older than 10 seconds
+  while (userMessages.length > 0 && now - userMessages[0].time > 10000) {
+    userMessages.shift();
+  }
+  
+  // Add current message
+  userMessages.push({ time: now, content: message });
+  
+  // Check for spam (more than 5 messages in 10 seconds)
+  if (userMessages.length > 5) {
     return {
-      blacklistedUsers: this.blacklistedUsers.size,
-      blacklistedThreads: this.blacklistedThreads.size,
-      bannedCommands: this.bannedCommands.size,
-      totalCommandLogs: this.commandLogs.length,
-      recentLogs: this.commandLogs.slice(-10)
+      isSpam: true,
+      messageCount: userMessages.length,
+      reason: 'Too many messages in short time'
     };
   }
   
-  getRecentSecurityEvents(limit = 50) {
-    return this.commandLogs
-      .filter(log => !log.success)
-      .slice(-limit)
-      .reverse();
+  // Check for repeated content
+  const recentSimilar = userMessages.filter(msg => 
+    msg.content === message && now - msg.time < 30000
+  );
+  
+  if (recentSimilar.length > 3) {
+    return {
+      isSpam: true,
+      messageCount: recentSimilar.length,
+      reason: 'Repeated message content'
+    };
   }
+  
+  return { isSpam: false };
 }
 
-function initSecurity(config) {
-  global.securityManager = new SecurityManager(config);
-  console.log('🔒 Security manager initialized');
-  return global.securityManager;
+function hasBannedWords(message) {
+  if (!config || !config.security || !config.security.bannedWords) {
+    return false;
+  }
+  
+  const bannedWords = config.security.bannedWords;
+  const lowerMessage = message.toLowerCase();
+  
+  return bannedWords.some(word => lowerMessage.includes(word.toLowerCase()));
 }
 
-export { SecurityManager, initSecurity };
+function checkPermission(userID, threadID, requiredLevel = 'user') {
+  if (isBlacklisted(userID, threadID)) {
+    return {
+      allowed: false,
+      reason: 'User or thread is blacklisted'
+    };
+  }
+  
+  if (requiredLevel === 'admin' && !isAdmin(userID)) {
+    return {
+      allowed: false,
+      reason: 'Admin permission required'
+    };
+  }
+  
+  return { allowed: true };
+}
+
+module.exports = {
+  initSecurity,
+  isAdmin,
+  isBlacklisted,
+  checkRateLimit,
+  detectSpam,
+  hasBannedWords,
+  checkPermission
+};

@@ -1,6 +1,6 @@
-import axios from 'axios';
+const axios = require('axios');
 
-export default {
+module.exports = {
   name: "joke",
   description: "Get a random joke",
   usage: "/joke",

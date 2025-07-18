@@ -1,6 +1,6 @@
-import { getUserRank } from '../bot/xp-system.js';
+const { getUserRank } = require('../bot/xp-system.js');
 
-export default {
+module.exports = {
   name: "rank",
   description: "Check your rank and XP",
   usage: "/rank [user]",

@@ -1,6 +1,6 @@
-import axios from 'axios';
+const axios = require('axios');
 
-export default {
+module.exports = {
   name: "ai",
   description: "Chat with AI assistant",
   usage: "/ai <message>",

@@ -1,56 +1,80 @@
-function initXPSystem(userData) {
-  console.log('📈 Initializing XP system...');
-  
-  // Initialize user data if not exists
-  if (!userData.users) {
-    userData.users = {};
-  }
-  
-  console.log('✅ XP system initialized');
+/**
+ * XP System for NeoBot
+ * Handles user experience points, levels, and rankings
+ */
+
+let userData = null;
+
+function initXPSystem(userDataRef) {
+  userData = userDataRef;
+  console.log('✅ XP System initialized');
 }
 
-function addXP(userData, userId, amount = 1) {
-  if (!userData.users[userId]) {
-    userData.users[userId] = {
+function addXP(userID, amount = 1) {
+  if (!userData || !userData.users) {
+    userData = { users: {} };
+  }
+  
+  if (!userData.users[userID]) {
+    userData.users[userID] = {
       name: '',
       xp: 0,
       level: 1,
-      avatar: '',
-      birthday: '',
-      relationship: '',
-      verified: false,
-      banned: false,
-      language: 'en',
-      joinDate: new Date().toISOString()
+      messageCount: 0,
+      joinedAt: Date.now(),
+      lastActive: Date.now()
     };
   }
   
-  userData.users[userId].xp += amount;
+  userData.users[userID].xp += amount;
+  userData.users[userID].lastActive = Date.now();
   
-  // Check for level up
-  const newLevel = Math.floor(userData.users[userId].xp / 100) + 1;
-  if (newLevel > userData.users[userId].level) {
-    userData.users[userId].level = newLevel;
-    return { levelUp: true, newLevel };
+  // Calculate level (10 XP per level)
+  const newLevel = Math.floor(userData.users[userID].xp / 10) + 1;
+  const oldLevel = userData.users[userID].level;
+  
+  userData.users[userID].level = newLevel;
+  
+  // Return level up status
+  return {
+    leveledUp: newLevel > oldLevel,
+    oldLevel,
+    newLevel,
+    currentXP: userData.users[userID].xp
+  };
+}
+
+function getUserLevel(userID) {
+  if (!userData || !userData.users || !userData.users[userID]) {
+    return { level: 1, xp: 0 };
   }
   
-  return { levelUp: false };
+  return {
+    level: userData.users[userID].level,
+    xp: userData.users[userID].xp
+  };
 }
 
-function getUserRank(userData, userId) {
-  const users = Object.entries(userData.users)
-    .map(([id, user]) => ({ id, ...user }))
-    .sort((a, b) => b.xp - a.xp);
+function getLeaderboard(limit = 10) {
+  if (!userData || !userData.users) {
+    return [];
+  }
   
-  const rank = users.findIndex(user => user.id === userId) + 1;
-  return rank || 0;
-}
-
-function getLeaderboard(userData, limit = 10) {
   return Object.entries(userData.users)
-    .map(([id, user]) => ({ id, ...user }))
-    .sort((a, b) => b.xp - a.xp)
-    .slice(0, limit);
+    .sort(([, a], [, b]) => b.xp - a.xp)
+    .slice(0, limit)
+    .map(([userID, user], index) => ({
+      rank: index + 1,
+      userID,
+      name: user.name || 'Unknown',
+      xp: user.xp,
+      level: user.level
+    }));
 }
 
-export { initXPSystem, addXP, getUserRank, getLeaderboard };
+module.exports = {
+  initXPSystem,
+  addXP,
+  getUserLevel,
+  getLeaderboard
+};

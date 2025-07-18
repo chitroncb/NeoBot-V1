@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   name: 'ping',
   description: 'Test bot response time',
   role: 0, // Available to all users

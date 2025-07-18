@@ -1,13 +1,7 @@
-import fs from 'fs';
-import path from 'path';
-import { fileURLToPath } from 'url';
-import { createRequire } from 'module';
+const fs = require('fs');
+const path = require('path');
 
-const require = createRequire(import.meta.url);
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-async function loadEvents() {
+function loadEvents() {
   const events = new Map();
   const eventsPath = path.join(__dirname, '../events');
   
@@ -25,7 +19,6 @@ async function loadEvents() {
       // Clear require cache to allow reloading
       delete require.cache[require.resolve(filePath)];
       
-      // Load CommonJS event handler
       const eventHandler = require(filePath);
       
       if (typeof eventHandler === 'function') {
@@ -44,4 +37,4 @@ async function loadEvents() {
   return events;
 }
 
-export { loadEvents };
+module.exports = { loadEvents };

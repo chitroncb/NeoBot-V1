@@ -1,4 +1,4 @@
-export default {
+module.exports = {
   name: 'groupadmin',
   description: 'Group admin test command',
   role: 3, // Group admin only

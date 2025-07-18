@@ -1,6 +1,6 @@
-import axios from 'axios';
+const axios = require('axios');
 
-export default {
+module.exports = {
   name: "weather",
   description: "Get weather information for a location",
   usage: "/weather <location>",
