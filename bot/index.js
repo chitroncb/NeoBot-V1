@@ -145,14 +145,34 @@ class NeoBot {
     initSecurity(this.config);
     
     // Set up message listener
-    this.api.listen((err, event) => {
-      if (err) {
-        console.error('❌ Listen error:', err);
+    try {
+      // Try the new listenMqtt method first
+      if (typeof this.api.listenMqtt === 'function') {
+        this.api.listenMqtt((err, event) => {
+          if (err) {
+            console.error('❌ Listen error:', err);
+            return;
+          }
+          this.handleEvent(event);
+        });
+      } else if (typeof this.api.listen === 'function') {
+        // Fallback to old listen method
+        this.api.listen((err, event) => {
+          if (err) {
+            console.error('❌ Listen error:', err);
+            return;
+          }
+          this.handleEvent(event);
+        });
+      } else {
+        console.error('❌ No listen method available on API object');
+        console.log('Available methods:', Object.getOwnPropertyNames(this.api));
         return;
       }
-      
-      this.handleEvent(event);
-    });
+    } catch (error) {
+      console.error('❌ Failed to set up message listener:', error);
+      return;
+    }
     
     console.log('🚀 NeoBot is now online!');
     console.log(`📊 Status: ${this.commands.size} commands, ${this.events.size} events`);

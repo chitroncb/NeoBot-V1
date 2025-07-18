@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   name: "message",
   description: "Handle incoming messages",
   
