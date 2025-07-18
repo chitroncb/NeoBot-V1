@@ -1,7 +1,7 @@
 {
   "botName": "NeoBot",
-  "prefix": "/",
-  "adminUid": "100083039411474",
+  "prefix": "!",
+  "adminUid": "61576186415592",
   "language": "en",
   "autoModeration": true,
   "welcomeMessage": "Welcome to our group! 🎉 Use /help to see available commands.",
