@@ -1,0 +1,28 @@
+{
+  "botName": "NeoBot",
+  "prefix": "/",
+  "adminUid": "100000000000000",
+  "language": "en",
+  "autoModeration": true,
+  "welcomeMessage": "Welcome to our group! 🎉 Use /help to see available commands.",
+  "maxCommandsPerMinute": 10,
+  "enableLogging": true,
+  "enableBlacklist": true,
+  "enableRateLimit": true,
+  "apiKeys": {
+    "weather": "your_weather_api_key",
+    "openai": "your_openai_api_key",
+    "webhook": "your_webhook_url"
+  },
+  "features": {
+    "xpSystem": true,
+    "rankSystem": true,
+    "autoReply": true,
+    "commandLogging": true
+  },
+  "security": {
+    "blacklistedUsers": [],
+    "blacklistedThreads": [],
+    "bannedCommands": []
+  }
+}

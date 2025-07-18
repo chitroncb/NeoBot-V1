@@ -1,0 +1,37 @@
+{
+  "uid": "100000000000000",
+  "cookies": [
+    {
+      "key": "datr",
+      "value": "example_datr_value",
+      "domain": ".facebook.com",
+      "path": "/",
+      "secure": true,
+      "httpOnly": true
+    },
+    {
+      "key": "sb",
+      "value": "example_sb_value", 
+      "domain": ".facebook.com",
+      "path": "/",
+      "secure": true,
+      "httpOnly": true
+    },
+    {
+      "key": "c_user",
+      "value": "100000000000000",
+      "domain": ".facebook.com",
+      "path": "/",
+      "secure": true,
+      "httpOnly": false
+    },
+    {
+      "key": "xs",
+      "value": "example_xs_value",
+      "domain": ".facebook.com", 
+      "path": "/",
+      "secure": true,
+      "httpOnly": true
+    }
+  ]
+}

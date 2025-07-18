@@ -1,0 +1,43 @@
+{
+  "welcome": "Welcome to the group! 🎉",
+  "goodbye": "Goodbye! 👋",
+  "help": {
+    "title": "Available Commands",
+    "description": "Here are all the available commands:",
+    "usage": "Use /help <command> for detailed information"
+  },
+  "weather": {
+    "title": "Weather Information",
+    "temperature": "Temperature",
+    "description": "Description",
+    "humidity": "Humidity",
+    "wind": "Wind Speed",
+    "pressure": "Pressure",
+    "visibility": "Visibility",
+    "not_found": "Location not found",
+    "error": "Failed to fetch weather data"
+  },
+  "ai": {
+    "title": "NeoBot AI",
+    "thinking": "Thinking...",
+    "error": "Failed to get AI response"
+  },
+  "xp": {
+    "level_up": "🎉 Congratulations! You've reached level {level}!",
+    "rank_card": "📊 Your Rank",
+    "level": "Level",
+    "xp": "XP",
+    "rank": "Rank"
+  },
+  "errors": {
+    "no_permission": "❌ You don't have permission to use this command",
+    "cooldown": "⏱️ Please wait {time} seconds before using this command again",
+    "api_error": "❌ API error occurred",
+    "invalid_usage": "❌ Invalid usage. Type /help {command} for help"
+  },
+  "success": {
+    "settings_saved": "✅ Settings saved successfully",
+    "user_banned": "✅ User banned successfully",
+    "user_unbanned": "✅ User unbanned successfully"
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "welcome": "Chào mừng đến với nhóm! 🎉",
+  "goodbye": "Tạm biệt! 👋",
+  "help": {
+    "title": "Các lệnh có sẵn",
+    "description": "Đây là tất cả các lệnh có sẵn:",
+    "usage": "Sử dụng /help <command> để biết thông tin chi tiết"
+  },
+  "weather": {
+    "title": "Thông tin thời tiết",
+    "temperature": "Nhiệt độ",
+    "description": "Mô tả",
+    "humidity": "Độ ẩm",
+    "wind": "Tốc độ gió",
+    "pressure": "Áp suất",
+    "visibility": "Tầm nhìn",
+    "not_found": "Không tìm thấy vị trí",
+    "error": "Không thể lấy dữ liệu thời tiết"
+  },
+  "ai": {
+    "title": "NeoBot AI",
+    "thinking": "Đang suy nghĩ...",
+    "error": "Không thể nhận phản hồi AI"
+  },
+  "xp": {
+    "level_up": "🎉 Chúc mừng! Bạn đã đạt level {level}!",
+    "rank_card": "📊 Hạng của bạn",
+    "level": "Cấp độ",
+    "xp": "XP",
+    "rank": "Hạng"
+  },
+  "errors": {
+    "no_permission": "❌ Bạn không có quyền sử dụng lệnh này",
+    "cooldown": "⏱️ Vui lòng đợi {time} giây trước khi sử dụng lệnh này lại",
+    "api_error": "❌ Lỗi API xảy ra",
+    "invalid_usage": "❌ Sử dụng không hợp lệ. Gõ /help {command} để được trợ giúp"
+  },
+  "success": {
+    "settings_saved": "✅ Cài đặt đã được lưu thành công",
+    "user_banned": "✅ Người dùng đã bị cấm thành công",
+    "user_unbanned": "✅ Người dùng đã được bỏ cấm thành công"
+  }
+}
