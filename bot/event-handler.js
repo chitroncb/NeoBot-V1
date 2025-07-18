@@ -1,5 +1,9 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function loadEvents() {
   const events = new Map();
@@ -15,9 +19,10 @@ async function loadEvents() {
   for (const file of eventFiles) {
     try {
       const filePath = path.join(eventsPath, file);
-      const event = require(filePath);
+      const module = await import(filePath);
+      const event = module.default;
       
-      if (event.name && event.execute) {
+      if (event && event.name && event.execute) {
         events.set(event.name, event);
         console.log(`✅ Loaded event: ${event.name}`);
       } else {
@@ -31,4 +36,4 @@ async function loadEvents() {
   return events;
 }
 
-module.exports = { loadEvents };
+export { loadEvents };

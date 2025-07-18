@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   name: "ban",
   description: "Ban a user from using the bot",
   usage: "/ban <user> [reason]",

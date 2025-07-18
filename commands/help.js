@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   name: "help",
   description: "Show available commands or get help for a specific command",
   usage: "/help [command]",

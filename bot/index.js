@@ -1,10 +1,14 @@
-const fs = require('fs');
-const path = require('path');
-const login = require('priyanshu-fca');
-const { loadCommands } = require('./command-loader');
-const { loadEvents } = require('./event-handler');
-const { initXPSystem } = require('./xp-system');
-const { initSecurity } = require('./security');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import login from 'priyanshu-fca';
+import { loadCommands } from './command-loader.js';
+import { loadEvents } from './event-handler.js';
+import { initXPSystem } from './xp-system.js';
+import { initSecurity } from './security.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * NeoBot - Advanced Messenger Bot

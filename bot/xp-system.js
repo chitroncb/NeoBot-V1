@@ -53,9 +53,4 @@ function getLeaderboard(userData, limit = 10) {
     .slice(0, limit);
 }
 
-module.exports = {
-  initXPSystem,
-  addXP,
-  getUserRank,
-  getLeaderboard
-};
+export { initXPSystem, addXP, getUserRank, getLeaderboard };

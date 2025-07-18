@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   name: "language",
   description: "Change your language preference",
   usage: "/language <en|bn|vi>",

@@ -1,5 +1,9 @@
-const fs = require('fs');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 async function loadCommands() {
   const commands = new Map();
@@ -15,9 +19,10 @@ async function loadCommands() {
   for (const file of commandFiles) {
     try {
       const filePath = path.join(commandsPath, file);
-      const command = require(filePath);
+      const module = await import(filePath);
+      const command = module.default;
       
-      if (command.name && command.execute) {
+      if (command && command.name && command.execute) {
         commands.set(command.name, command);
         console.log(`✅ Loaded command: ${command.name}`);
       } else {
@@ -31,4 +36,4 @@ async function loadCommands() {
   return commands;
 }
 
-module.exports = { loadCommands };
+export { loadCommands };
