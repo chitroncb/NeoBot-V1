@@ -32,10 +32,10 @@ class NeoBot {
       console.error('❌ Failed to load config.json:', error.message);
       // Create default config if not exists
       this.config = {
-        prefix: '!',
-        adminUid: '61576186415592',
+        prefix: '-',
+        adminUid: '100077380038521',
         enableLogging: true,
-        name: 'NeoBot',
+        name: ':> 𝗛𝗼𝗻𝗲𝘆 𝗕𝘂𝗻𝗻𝘆 🩷🐇',
         version: '1.0.0'
       };
       
